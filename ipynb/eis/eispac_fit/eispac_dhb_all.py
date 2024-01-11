@@ -3,12 +3,14 @@ from eispac_fit import eispac_fit
 from glob import glob
 import os
 
-data_filepaths = ["../../../src/EIS/DHB_007_v2/20221020T0343/",
-                  "../../../src/EIS/DHB_007_v2/20221020T2343/",
-                  "../../../src/EIS/DHB_007_v2/20221022T0630/",
-                  "../../../src/EIS/DHB_007_v2/20221022T2140/",
-                  "../../../src/EIS/DHB_007_v2/20221023T2038/",
-                  "../../../src/EIS/DHB_007_v2/20221025T0023/"]         
+# data_filepaths = ["../../../src/EIS/DHB_007_v2/20221020T0343/",
+#                   "../../../src/EIS/DHB_007_v2/20221020T2343/",
+#                   "../../../src/EIS/DHB_007_v2/20221022T0630/",
+#                   "../../../src/EIS/DHB_007_v2/20221022T2140/",
+#                   "../../../src/EIS/DHB_007_v2/20221023T2038/",
+#                   "../../../src/EIS/DHB_007_v2/20221025T0023/"]        
+
+data_filepaths = ["../../../src/EIS/DHB_007_v2/20221025T2011/"] 
 
 fe_12_195_1c_template = "../../../src/EIS/EISPAC_templates/fe_12_195_119.1c.template.h5"
 fe_12_195_2c_template = "../../../src/EIS/EISPAC_templates/fe_12_195_119.2c.template.h5"
