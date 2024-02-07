@@ -27,18 +27,32 @@ import os
 from sun_blinker import SunBlinker
 from copy import deepcopy   
 from glob import glob
+import h5py
 
 eui_files = sorted(glob("../../src/EUI/HRI/euv174/20221024/solo_L2_eui-hri*.fits"))
 eui_map_seq = sunpy.map.Map(eui_files[:],sequence=True,memmap=True)
 eui_template = sunpy.map.Map(eui_files[181]).submap([500,500]*u.pix,top_right=[1500,1500]*u.pix)
 
-eis_195_velmap_derot_repro_shifted_hrifov = sunpy.map.Map("../../src/EIS/DHB_007_v2/20221025T0023/sunpymaps/eis_195_velmap_derot_repro_shifted_hrifov.fits")
+eis_195_velmap_derot_repro_shifted_hrifov = sunpy.map.Map("../../src/EIS/DHB_007_v2/20221025T0023/sunpymaps/eis_195_velmap_derot_repro_hrifov.fits")
+
+if os.path.exists ("../../src/EUI/HRI/euv174/20221024/coalign_shifts.h5"):
+    with h5py.File("../../src/EUI/HRI/euv174/20221024/coalign_shifts.h5","r") as f:
+        eui_map_seq_coalign_shifts_x = f["x"][()]
+        eui_map_seq_coalign_shifts_y = f["y"][()]
+    eui_map_seq_coalign_shifts = {"x":eui_map_seq_coalign_shifts_x*u.arcsec,"y":eui_map_seq_coalign_shifts_y*u.arcsec}
+else:
+    eui_map_seq_coalign_shifts = coalignment.calculate_match_template_shift(eui_map_seq,template=eui_template)
+    eui_map_seq_coalign_shifts_x = eui_map_seq_coalign_shifts["x"].value
+    eui_map_seq_coalign_shifts_y = eui_map_seq_coalign_shifts["y"].value
+
+    with h5py.File("../../src/EUI/HRI/euv174/20221024/coalign_shifts.h5","w") as f:
+        f.create_dataset("x",data=eui_map_seq_coalign_shifts_x)
+        f.create_dataset("y",data=eui_map_seq_coalign_shifts_y)
 
 
-eui_map_seq_coalign_shifts = coalignment.calculate_match_template_shift(eui_map_seq,template=eui_template)
 eui_map_seq_coalign = coalignment.mapsequence_coalign_by_match_template(eui_map_seq,shift=eui_map_seq_coalign_shifts)
 
-Txshift_hri, Tyshift_hri = 1.67083*u.arcsec,7.60192*u.arcsec
+Txshift_hri, Tyshift_hri = (1.67083 + 1.40322)*u.arcsec,(7.60192 - 2.32321 )*u.arcsec
 
 for ii, map in enumerate(eui_map_seq_coalign[:]):
     map = map.shift_reference_coord(Txshift_hri,Tyshift_hri)
