@@ -1,3 +1,9 @@
+# This program uses sunkit_image 0.51, when the function calculate_match_template_shift 
+# and mapsequence_coalign_by_match_template assumes the rotation matrix PC_ij is the identity matrix.
+# This is not the case for the EUI HRI images, but the function mapsequence_coalign_by_match_template
+# converts the wrong shift in arcsecs to pixels in the wrong way as well, so the result is correct.
+# The bug has been reported to the sunkit_image developers and might be fixed in the future.
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
@@ -31,9 +37,11 @@ import h5py
 
 eui_files = sorted(glob("../../src/EUI/HRI/euv174/20221024/solo_L2_eui-hri*.fits"))
 eui_map_seq = sunpy.map.Map(eui_files[:],sequence=True,memmap=True)
-eui_template = sunpy.map.Map(eui_files[181]).submap([500,500]*u.pix,top_right=[1500,1500]*u.pix)
+# eui_map_seq = coalignment.mapsequence_coalign_by_rotation(eui_map_seq,layer_index=181)
+# eui_template = sunpy.map.Map(eui_files[181]).submap([500,500]*u.pix,top_right=[1500,1500]*u.pix)
 
 eis_195_velmap_derot_repro_shifted_hrifov = sunpy.map.Map("../../src/EIS/DHB_007_v2/20221025T0023/sunpymaps/eis_195_velmap_derot_repro_hrifov.fits")
+eis_hhflare_195_velmap_derot_repro_hrifov = sunpy.map.Map("../../src/coalign_map/20221024/eis_hhflare_195_velmap_derot_repro_hrifov.fits")
 
 if os.path.exists ("../../src/EUI/HRI/euv174/20221024/coalign_shifts.h5"):
     with h5py.File("../../src/EUI/HRI/euv174/20221024/coalign_shifts.h5","r") as f:
@@ -41,7 +49,7 @@ if os.path.exists ("../../src/EUI/HRI/euv174/20221024/coalign_shifts.h5"):
         eui_map_seq_coalign_shifts_y = f["y"][()]
     eui_map_seq_coalign_shifts = {"x":eui_map_seq_coalign_shifts_x*u.arcsec,"y":eui_map_seq_coalign_shifts_y*u.arcsec}
 else:
-    eui_map_seq_coalign_shifts = coalignment.calculate_match_template_shift(eui_map_seq,template=eui_template)
+    eui_map_seq_coalign_shifts = coalignment.calculate_match_template_shift(eui_map_seq,layer_index=181)
     eui_map_seq_coalign_shifts_x = eui_map_seq_coalign_shifts["x"].value
     eui_map_seq_coalign_shifts_y = eui_map_seq_coalign_shifts["y"].value
 
@@ -54,29 +62,55 @@ eui_map_seq_coalign = coalignment.mapsequence_coalign_by_match_template(eui_map_
 
 Txshift_hri, Tyshift_hri = (1.67083 + 1.40322)*u.arcsec,(7.60192 - 2.32321 )*u.arcsec
 
+map_181 = eui_map_seq_coalign[181].shift_reference_coord(Txshift_hri,Tyshift_hri)
+eui_map_region_east_181 = map_181.submap([400,200]*u.pix,top_right=[800,800]*u.pix)
+eui_map_region_west_181 = map_181.submap([1500,0]*u.pix,top_right=[2048,800]*u.pix)
+eui_map_region_center_181 = map_181.submap([1100,700]*u.pix,top_right=[1300,1000]*u.pix)
+
 for ii, map in enumerate(eui_map_seq_coalign[:]):
     map = map.shift_reference_coord(Txshift_hri,Tyshift_hri)
     map_date = map.date
-    map = map.reproject_to(eui_map_seq_coalign[0].wcs)
-    eui_map_region_east = map.submap([400,300]*u.pix,top_right=[800,800]*u.pix)
+    # map = map.reproject_to(eui_map_seq_coalign[0].wcs)
+    eui_map_region_east = map.submap([400,200]*u.pix,top_right=[800,800]*u.pix)
     eui_map_region_west = map.submap([1500,0]*u.pix,top_right=[2048,800]*u.pix)
+    eui_map_region_center = map.submap([1100,700]*u.pix,top_right=[1300,1000]*u.pix)
 
-    fig = plt.figure(figsize=(8,6),constrained_layout=True)
-    ax1 = fig.add_subplot(1,2,1,projection=eui_map_region_east)
-    ax2 = fig.add_subplot(1,2,2,projection=eui_map_region_west)
-    # ax2.set_ylabel(" ")
+    fig = plt.figure(figsize=(10,6),constrained_layout=True)
 
-    eui_map_region_east.plot(axes=ax1,norm=ImageNormalize(vmin=10,vmax=4000,stretch=AsinhStretch(0.1)))
-    eui_map_region_west.plot(axes=ax2,norm=ImageNormalize(vmin=10,vmax=4000,stretch=AsinhStretch(0.1)))
+    ax1 = fig.add_subplot(1,3,1,projection=eui_map_region_east_181)
+    ax2 = fig.add_subplot(1,3,2,projection=eui_map_region_west_181)
+    ax3 = fig.add_subplot(1,3,3,projection=eui_map_region_center_181)
+
+    ax1.imshow(eui_map_region_east.data,origin="lower",cmap="solar orbiterhri_euv174",norm=ImageNormalize(vmin=10,vmax=4000,stretch=AsinhStretch(0.1)))
+    ax2.imshow(eui_map_region_west.data,origin="lower",cmap="solar orbiterhri_euv174",norm=ImageNormalize(vmin=10,vmax=4000,stretch=AsinhStretch(0.1)))
+    ax3.imshow(eui_map_region_center.data,origin="lower",cmap="solar orbiterhri_euv174",norm=ImageNormalize(vmin=10,vmax=1e4,stretch=AsinhStretch(0.3)))
+
+    # eui_map_region_east.plot(axes=ax1,norm=ImageNormalize(vmin=10,vmax=4000,stretch=AsinhStretch(0.1)))
+    # eui_map_region_west.plot(axes=ax2,norm=ImageNormalize(vmin=10,vmax=4000,stretch=AsinhStretch(0.1)))
+    # eui_map_region_center.plot(axes=ax3,norm=ImageNormalize(vmin=10,vmax=4000,stretch=AsinhStretch(0.3)))
+
+    ax2.set_ylabel(' ')
+    ax3.set_ylabel(' ')
+    ax1.set_ylabel('Solar-Y [arcsec]')
 
     ax1.set_title(f"East {map_date}")
     ax2.set_title(f"West {map_date}")
+    ax3.set_title(f"Center {map_date}")
 
     for ax_ in (ax1,ax2):
         bounds = ax_.axis()
         eis_195_velmap_derot_repro_shifted_hrifov.draw_contours(levels=[-10,-5,5,10],colors=["#005CAF","#58B2DC","#F05E1C","#E83015"],alpha=0.8,
                                                                    axes=ax_)
         ax_.axis(bounds)
+    
+    bounds = ax3.axis()
+    eis_hhflare_195_velmap_derot_repro_hrifov.draw_contours(levels=[-10,-5,5,10],colors=["#005CAF","#58B2DC","#F05E1C","#E83015"],alpha=0.8,
+                                                             axes=ax3)
+    ax3.axis(bounds)
+
+    for ax_ in (ax1,ax2,ax3):
+        ax_.grid("on",alpha=0.5,ls=":")
+        ax_.set_xlabel('Solar-X [arcsec]')
 
     plt.savefig(fname=os.path.join("../../figs/EUI/20221024/upflow_video/",f"eui_hri_20221024_{ii:03d}.png"),
                 dpi=300)
