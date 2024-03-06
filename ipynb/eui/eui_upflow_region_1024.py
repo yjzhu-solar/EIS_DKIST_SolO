@@ -60,9 +60,10 @@ else:
 
 eui_map_seq_coalign = coalignment.mapsequence_coalign_by_match_template(eui_map_seq,shift=eui_map_seq_coalign_shifts)
 
-Txshift_hri, Tyshift_hri = (1.67083 + 1.40322)*u.arcsec,(7.60192 - 2.32321 )*u.arcsec
+Txshift_hri, Tyshift_hri = (1.66986 + 2.49223)*u.arcsec,(7.60204 - 2.76366 )*u.arcsec
 
 map_181 = eui_map_seq_coalign[181].shift_reference_coord(Txshift_hri,Tyshift_hri)
+map_181.meta["rsun_ref"] = 696000000.0
 eui_map_region_east_181 = map_181.submap([400,200]*u.pix,top_right=[800,800]*u.pix)
 eui_map_region_west_181 = map_181.submap([1500,0]*u.pix,top_right=[2048,800]*u.pix)
 eui_map_region_center_181 = map_181.submap([1100,700]*u.pix,top_right=[1300,1000]*u.pix)
