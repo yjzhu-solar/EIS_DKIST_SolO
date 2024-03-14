@@ -23,6 +23,7 @@ import astropy.units as u
 import astropy.constants as const
 from astropy.io import fits
 import datetime
+from watroo import wow
 
 import cmcrameri.cm as cmcm
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
@@ -55,11 +56,16 @@ def get_nearest_hmi_index(eui_map_date,hmi_date_obs, time_shift=datetime.timedel
     return (np.abs(eui_map_date + time_shift - hmi_date_obs )).argmin()
 
 def plot_eui_hmi_cutout(eui_map,hmi_map_hrifov,phi_los_map,eis_vel_map,bottom_left,top_right,
-                        eui_norm,hmi_norm,eui_map_date, hmi_map_date,save_dir,figsize=(8,8),):
+                        eui_norm,hmi_norm,eui_map_date, hmi_map_date,save_dir,figsize=(8,8),wow_filter=True):
     
     eui_map_cutout = eui_map.submap(bottom_left,top_right=top_right)
     hmi_map_cutout = hmi_map_hrifov.submap(bottom_left,top_right=top_right)
     phi_los_map_cutout = phi_los_map.submap(bottom_left,top_right=top_right)
+
+    if wow_filter is True:
+        eui_norm = ImageNormalize()
+        eui_map_cutout = sunpy.map.Map(wow(eui_map_cutout.data,bilateral=1,weights=[],denoise_coefficients=[5, 2])[0],
+                                       eui_map_cutout.meta)
 
     fig = plt.figure(figsize=figsize,layout='constrained')
 
@@ -97,6 +103,8 @@ def plot_eui_hmi_cutout(eui_map,hmi_map_hrifov,phi_los_map,eis_vel_map,bottom_le
         ax_.axis(bounds)
 
     # plt.show()
+    if os.path.exists(os.path.dirname(save_dir)) is False:
+        os.makedirs(os.path.dirname(save_dir))
     plt.savefig(save_dir,dpi=300,bbox_inches="tight")
     fig.clf()
     plt.close(fig)
@@ -194,82 +202,82 @@ if __name__ == '__main__':
         hmi_map_ = hmi_map_repro_hrifov[hmi_map_index_]
         hmi_map_date = hmi_date_obs[hmi_map_index_]
 
-        # plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
-        #                     [500,600]*u.pix,[670,760]*u.pix,
-        #                     ImageNormalize(vmin=150,vmax=1.5e3,stretch=AsinhStretch(0.4)),
-        #                     ImageNormalize(vmin=-1000,vmax=1000),
-        #                     eui_map_date, hmi_map_date,
-        #                     f"../../figs/EUI/20221024/zoomin_hmi/east_1/eui_hmi_cutout_{ii:03}.png")
+        plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
+                            [500,600]*u.pix,[670,760]*u.pix,
+                            ImageNormalize(vmin=150,vmax=1.5e3,stretch=AsinhStretch(0.4)),
+                            ImageNormalize(vmin=-1000,vmax=1000),
+                            eui_map_date, hmi_map_date,
+                            f"../../figs/EUI/20221024/zoomin_hmi/east_1_wow/eui_hmi_cutout_{ii:03}.png")
         
-        # plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
-        #                     [1800,200]*u.pix,[2000,500]*u.pix,
-        #                     ImageNormalize(vmin=300,vmax=2.7e3,stretch=AsinhStretch(0.4)),
-        #                     ImageNormalize(vmin=-1000,vmax=1000),
-        #                     eui_map_date, hmi_map_date,
-        #                     f"../../figs/EUI/20221024/zoomin_hmi/west_2/eui_hmi_cutout_{ii:03}.png")
+        plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
+                            [1800,200]*u.pix,[2000,500]*u.pix,
+                            ImageNormalize(vmin=300,vmax=2.7e3,stretch=AsinhStretch(0.4)),
+                            ImageNormalize(vmin=-1000,vmax=1000),
+                            eui_map_date, hmi_map_date,
+                            f"../../figs/EUI/20221024/zoomin_hmi/west_2_wow/eui_hmi_cutout_{ii:03}.png")
 
-        # plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
-        #                     [1700,500]*u.pix,[1970,800]*u.pix,
-        #                     ImageNormalize(vmin=500,vmax=6e3,stretch=AsinhStretch(0.4)),
-        #                     ImageNormalize(vmin=-1000,vmax=1000),
-        #                     eui_map_date, hmi_map_date,
-        #                     f"../../figs/EUI/20221024/zoomin_hmi/west_1/eui_hmi_cutout_{ii:03}.png")
+        plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
+                            [1700,500]*u.pix,[1970,800]*u.pix,
+                            ImageNormalize(vmin=500,vmax=6e3,stretch=AsinhStretch(0.4)),
+                            ImageNormalize(vmin=-1000,vmax=1000),
+                            eui_map_date, hmi_map_date,
+                            f"../../figs/EUI/20221024/zoomin_hmi/west_1_wow/eui_hmi_cutout_{ii:03}.png")
         
-        # plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_hhflare_195_velmap_derot_repro_hrifov,
-        #                     [1120,740]*u.pix,[1260,900]*u.pix,
-        #                     ImageNormalize(vmin=5e2,vmax=1.2e4,stretch=AsinhStretch(0.4)),
-        #                     ImageNormalize(vmin=-1000,vmax=1000),
-        #                     eui_map_date, hmi_map_date,
-        #                     f"../../figs/EUI/20221024/zoomin_hmi/center_1/eui_hmi_cutout_{ii:03}.png")
+        plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_hhflare_195_velmap_derot_repro_hrifov,
+                            [1120,740]*u.pix,[1260,900]*u.pix,
+                            ImageNormalize(vmin=5e2,vmax=1.2e4,stretch=AsinhStretch(0.4)),
+                            ImageNormalize(vmin=-1000,vmax=1000),
+                            eui_map_date, hmi_map_date,
+                            f"../../figs/EUI/20221024/zoomin_hmi/center_1_wow/eui_hmi_cutout_{ii:03}.png")
         
-        # plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
-        #                     [500,400]*u.pix,[710,600]*u.pix,
-        #                     ImageNormalize(vmin=100,vmax=1.5e3,stretch=AsinhStretch(0.4)),
-        #                     ImageNormalize(vmin=-1000,vmax=1000),
-        #                     eui_map_date, hmi_map_date,
-        #                     f"../../figs/EUI/20221024/zoomin_hmi/east_2/eui_hmi_cutout_{ii:03}.png")
+        plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
+                            [500,400]*u.pix,[710,600]*u.pix,
+                            ImageNormalize(vmin=100,vmax=1.5e3,stretch=AsinhStretch(0.4)),
+                            ImageNormalize(vmin=-1000,vmax=1000),
+                            eui_map_date, hmi_map_date,
+                            f"../../figs/EUI/20221024/zoomin_hmi/east_2_wow/eui_hmi_cutout_{ii:03}.png")
 
         plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
                             [450,1100]*u.pix,[650,1400]*u.pix,
                             ImageNormalize(vmin=100,vmax=4e3,stretch=AsinhStretch(0.1)),
                             ImageNormalize(vmin=-1000,vmax=1000),
                             eui_map_date, hmi_map_date,
-                            f"../../figs/EUI/20221024/zoomin_hmi_noupflow/region_1/eui_hmi_cutout_{ii:03}.png")
+                            f"../../figs/EUI/20221024/zoomin_hmi_noupflow/region_1_wow/eui_hmi_cutout_{ii:03}.png")
 
         plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
                             [500,800]*u.pix,[700,1000]*u.pix,
                             ImageNormalize(vmin=100,vmax=8e3,stretch=AsinhStretch(0.1)),
                             ImageNormalize(vmin=-1000,vmax=1000),
                             eui_map_date, hmi_map_date,
-                            f"../../figs/EUI/20221024/zoomin_hmi_noupflow/region_2/eui_hmi_cutout_{ii:03}.png")
+                            f"../../figs/EUI/20221024/zoomin_hmi_noupflow/region_2_wow/eui_hmi_cutout_{ii:03}.png")
         
         plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
                             [850,700]*u.pix,[1050,1000]*u.pix,
                             ImageNormalize(vmin=100,vmax=7e3,stretch=AsinhStretch(0.1)),
                             ImageNormalize(vmin=-1000,vmax=1000),
                             eui_map_date, hmi_map_date,
-                            f"../../figs/EUI/20221024/zoomin_hmi_noupflow/region_3/eui_hmi_cutout_{ii:03}.png")
+                            f"../../figs/EUI/20221024/zoomin_hmi_noupflow/region_3_wow/eui_hmi_cutout_{ii:03}.png")
 
         plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
                             [1100,1350]*u.pix,[1300,1600]*u.pix,
                             ImageNormalize(vmin=250,vmax=3e3,stretch=AsinhStretch(0.3)),
                             ImageNormalize(vmin=-1000,vmax=1000),
                             eui_map_date, hmi_map_date,
-                            f"../../figs/EUI/20221024/zoomin_hmi_noupflow/region_4/eui_hmi_cutout_{ii:03}.png")
+                            f"../../figs/EUI/20221024/zoomin_hmi_noupflow/region_4_wow/eui_hmi_cutout_{ii:03}.png")
 
         plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
                             [1500,700]*u.pix,[1700,1000]*u.pix,
                             ImageNormalize(vmin=100,vmax=7e3,stretch=AsinhStretch(0.1)),
                             ImageNormalize(vmin=-1000,vmax=1000),
                             eui_map_date, hmi_map_date,
-                            f"../../figs/EUI/20221024/zoomin_hmi_noupflow/region_5/eui_hmi_cutout_{ii:03}.png")
+                            f"../../figs/EUI/20221024/zoomin_hmi_noupflow/region_5_wow/eui_hmi_cutout_{ii:03}.png")
 
         plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
                             [850,150]*u.pix,[1150,400]*u.pix,
                             ImageNormalize(vmin=150,vmax=2e3,stretch=AsinhStretch(0.15)),
                             ImageNormalize(vmin=-1000,vmax=1000),
                             eui_map_date, hmi_map_date,
-                            f"../../figs/EUI/20221024/zoomin_hmi_noupflow/region_6/eui_hmi_cutout_{ii:03}.png")
+                            f"../../figs/EUI/20221024/zoomin_hmi_noupflow/region_6_wow/eui_hmi_cutout_{ii:03}.png")
 
 
         os.system('clear')
