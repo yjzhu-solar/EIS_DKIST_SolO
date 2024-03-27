@@ -24,6 +24,7 @@ import astropy.constants as const
 from astropy.io import fits
 import datetime
 from watroo import wow
+from tqdm import tqdm
 
 import cmcrameri.cm as cmcm
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
@@ -113,19 +114,17 @@ def plot_eui_hmi_cutout(eui_map,hmi_map_hrifov,phi_los_map,eis_vel_map,bottom_le
 
 
 if __name__ == '__main__':
-    # eui_files = sorted(glob("../../src/EUI/HRI/euv174/20221024/solo_L2_eui-hri*.fits"))
-    # eui_map_seq = sunpy.map.Map(eui_files[:],sequence=True,memmap=True)
-    # # eui_map_seq = coalignment.mapsequence_coalign_by_rotation(eui_map_seq,layer_index=181)
-    # # eui_template = sunpy.map.Map(eui_files[181]).submap([500,500]*u.pix,top_right=[1500,1500]*u.pix)
+    eui_files = sorted(glob("../../src/EUI/HRI/euv174/20221024/solo_L2_eui-hri*.fits"))
+    eui_map_seq = sunpy.map.Map(eui_files[:],sequence=True,memmap=True)
 
     eis_195_velmap_derot_repro_shifted_hrifov = sunpy.map.Map("../../src/EIS/DHB_007_v2/20221025T0023/sunpymaps/eis_195_velmap_derot_repro_hrifov.fits")
     eis_hhflare_195_velmap_derot_repro_hrifov = sunpy.map.Map("../../src/coalign_map/20221024/eis_hhflare_195_velmap_derot_repro_hrifov.fits")
 
-    # if os.path.exists ("../../src/EUI/HRI/euv174/20221024/coalign_shifts_step.h5"):
-    #     with h5py.File("../../src/EUI/HRI/euv174/20221024/coalign_shifts_step.h5","r") as f:
-    #         eui_map_seq_coalign_shifts_x = f["x"][()]
-    #         eui_map_seq_coalign_shifts_y = f["y"][()]
-    #     eui_map_seq_coalign_shifts = {"x":eui_map_seq_coalign_shifts_x*u.arcsec,"y":eui_map_seq_coalign_shifts_y*u.arcsec}
+    if os.path.exists ("../../src/EUI/HRI/euv174/20221024/coalign_shifts_step_mandal.h5"):
+        with h5py.File("../../src/EUI/HRI/euv174/20221024/coalign_shifts_step_mandal.h5","r") as f:
+            eui_map_seq_coalign_shifts_x = f["x"][()]
+            eui_map_seq_coalign_shifts_y = f["y"][()]
+        eui_map_seq_coalign_shifts = {"x":eui_map_seq_coalign_shifts_x*u.arcsec,"y":eui_map_seq_coalign_shifts_y*u.arcsec}
     # else:
     #     eui_map_exampe_shift_x = np.zeros(9)
     #     eui_map_exampe_shift_y = np.zeros(9)
@@ -192,7 +191,7 @@ if __name__ == '__main__':
     hmi_map_repro_hrifov_files = sorted(glob("../../src/HMI/20221024/lvl15_cutout_repro_hrifov/*.fits"))
     hmi_map_repro_hrifov = sunpy.map.Map(hmi_map_repro_hrifov_files,sequence=True,memmap=True)
 
-    for ii, eui_map_ in enumerate(eui_map_seq_coalign[:]):
+    for ii, eui_map_ in enumerate(tqdm(eui_map_seq_coalign[:])):
         eui_map_date = eui_map_seq_coalign[ii].date.to_datetime()
 
         eui_map_fake = sunpy.map.Map(eui_map_.data,map_181.meta)
@@ -279,6 +278,3 @@ if __name__ == '__main__':
                             eui_map_date, hmi_map_date,
                             f"../../figs/EUI/20221024/zoomin_hmi_noupflow/region_6_wow/eui_hmi_cutout_{ii:03}.png")
 
-
-        os.system('clear')
-        print(f"Done {ii}")

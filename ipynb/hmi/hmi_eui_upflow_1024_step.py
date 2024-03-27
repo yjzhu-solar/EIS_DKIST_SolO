@@ -37,6 +37,7 @@ from sun_blinker import SunBlinker
 from copy import deepcopy   
 from glob import glob
 import h5py
+from tqdm import tqdm
 
 def plot_colorbar(im, ax, width="3%", height="100%",loc="lower left",fontsize=10,
                   bbox_to_anchor=(1.02, 0., 1, 1),orientation="vertical"):
@@ -184,7 +185,7 @@ if __name__ == '__main__':
     hmi_map_repro_hrifov_files = sorted(glob("../../src/HMI/20221024/lvl15_cutout_repro_hrifov/*.fits"))
     hmi_map_repro_hrifov = sunpy.map.Map(hmi_map_repro_hrifov_files,sequence=True,memmap=True)
 
-    for ii, eui_map_ in enumerate(eui_map_seq_coalign[:]):
+    for ii, eui_map_ in enumerate(tqdm(eui_map_seq_coalign[:])):
         eui_map_date = eui_map_seq_coalign[ii].date.to_datetime()
 
         eui_map_fake = sunpy.map.Map(eui_map_.data,map_181.meta)
@@ -194,40 +195,40 @@ if __name__ == '__main__':
         hmi_map_ = hmi_map_repro_hrifov[hmi_map_index_]
         hmi_map_date = hmi_date_obs[hmi_map_index_]
 
-        # plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
-        #                     [500,600]*u.pix,[670,760]*u.pix,
-        #                     ImageNormalize(vmin=150,vmax=1.5e3,stretch=AsinhStretch(0.4)),
-        #                     ImageNormalize(vmin=-1000,vmax=1000),
-        #                     eui_map_date, hmi_map_date,
-        #                     f"../../figs/EUI/20221024/zoomin_hmi/east_1/eui_hmi_cutout_{ii:03}.png")
+        plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
+                            [500,600]*u.pix,[670,760]*u.pix,
+                            ImageNormalize(vmin=150,vmax=1.5e3,stretch=AsinhStretch(0.4)),
+                            ImageNormalize(vmin=-1000,vmax=1000),
+                            eui_map_date, hmi_map_date,
+                            f"../../figs/EUI/20221024/zoomin_hmi/east_1/eui_hmi_cutout_{ii:03}.png")
         
-        # plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
-        #                     [1800,200]*u.pix,[2000,500]*u.pix,
-        #                     ImageNormalize(vmin=300,vmax=2.7e3,stretch=AsinhStretch(0.4)),
-        #                     ImageNormalize(vmin=-1000,vmax=1000),
-        #                     eui_map_date, hmi_map_date,
-        #                     f"../../figs/EUI/20221024/zoomin_hmi/west_2/eui_hmi_cutout_{ii:03}.png")
+        plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
+                            [1800,200]*u.pix,[2000,500]*u.pix,
+                            ImageNormalize(vmin=300,vmax=2.7e3,stretch=AsinhStretch(0.4)),
+                            ImageNormalize(vmin=-1000,vmax=1000),
+                            eui_map_date, hmi_map_date,
+                            f"../../figs/EUI/20221024/zoomin_hmi/west_2/eui_hmi_cutout_{ii:03}.png")
 
-        # plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
-        #                     [1700,500]*u.pix,[1970,800]*u.pix,
-        #                     ImageNormalize(vmin=500,vmax=6e3,stretch=AsinhStretch(0.4)),
-        #                     ImageNormalize(vmin=-1000,vmax=1000),
-        #                     eui_map_date, hmi_map_date,
-        #                     f"../../figs/EUI/20221024/zoomin_hmi/west_1/eui_hmi_cutout_{ii:03}.png")
+        plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
+                            [1700,500]*u.pix,[1970,800]*u.pix,
+                            ImageNormalize(vmin=500,vmax=6e3,stretch=AsinhStretch(0.4)),
+                            ImageNormalize(vmin=-1000,vmax=1000),
+                            eui_map_date, hmi_map_date,
+                            f"../../figs/EUI/20221024/zoomin_hmi/west_1/eui_hmi_cutout_{ii:03}.png")
         
-        # plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_hhflare_195_velmap_derot_repro_hrifov,
-        #                     [1120,740]*u.pix,[1260,900]*u.pix,
-        #                     ImageNormalize(vmin=5e2,vmax=1.2e4,stretch=AsinhStretch(0.4)),
-        #                     ImageNormalize(vmin=-1000,vmax=1000),
-        #                     eui_map_date, hmi_map_date,
-        #                     f"../../figs/EUI/20221024/zoomin_hmi/center_1/eui_hmi_cutout_{ii:03}.png")
+        plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_hhflare_195_velmap_derot_repro_hrifov,
+                            [1120,740]*u.pix,[1260,900]*u.pix,
+                            ImageNormalize(vmin=5e2,vmax=1.2e4,stretch=AsinhStretch(0.4)),
+                            ImageNormalize(vmin=-1000,vmax=1000),
+                            eui_map_date, hmi_map_date,
+                            f"../../figs/EUI/20221024/zoomin_hmi/center_1/eui_hmi_cutout_{ii:03}.png")
         
-        # plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
-        #                     [500,400]*u.pix,[710,600]*u.pix,
-        #                     ImageNormalize(vmin=100,vmax=1.5e3,stretch=AsinhStretch(0.4)),
-        #                     ImageNormalize(vmin=-1000,vmax=1000),
-        #                     eui_map_date, hmi_map_date,
-        #                     f"../../figs/EUI/20221024/zoomin_hmi/east_2/eui_hmi_cutout_{ii:03}.png")
+        plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
+                            [500,400]*u.pix,[710,600]*u.pix,
+                            ImageNormalize(vmin=100,vmax=1.5e3,stretch=AsinhStretch(0.4)),
+                            ImageNormalize(vmin=-1000,vmax=1000),
+                            eui_map_date, hmi_map_date,
+                            f"../../figs/EUI/20221024/zoomin_hmi/east_2/eui_hmi_cutout_{ii:03}.png")
 
         plot_eui_hmi_cutout(eui_map_fake,hmi_map_,phi_los_map_hrifov,eis_195_velmap_derot_repro_shifted_hrifov,
                             [450,1100]*u.pix,[650,1400]*u.pix,
@@ -270,7 +271,3 @@ if __name__ == '__main__':
                             ImageNormalize(vmin=-1000,vmax=1000),
                             eui_map_date, hmi_map_date,
                             f"../../figs/EUI/20221024/zoomin_hmi_noupflow/region_6/eui_hmi_cutout_{ii:03}.png")
-
-
-        os.system('clear')
-        print(f"Done {ii}")
