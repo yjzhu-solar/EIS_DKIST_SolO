@@ -45,7 +45,7 @@ eui_map_seq = sunpy.map.Map(eui_files[:],sequence=True,memmap=True)
 eis_195_velmap_derot_repro_shifted_hrifov = sunpy.map.Map("../../src/EIS/DHB_007_v2/20221025T0023/sunpymaps/eis_195_velmap_derot_repro_hrifov.fits")
 eis_hhflare_195_velmap_derot_repro_hrifov = sunpy.map.Map("../../src/coalign_map/20221024/eis_hhflare_195_velmap_derot_repro_hrifov.fits")
 
-overwrite_coalign = True
+overwrite_coalign = False
 if os.path.exists ("../../src/EUI/HRI/euv174/20221024/coalign_shifts_step_mandal.h5") and not overwrite_coalign:
     with h5py.File("../../src/EUI/HRI/euv174/20221024/coalign_shifts_step_mandal.h5","r") as f:
         eui_map_seq_coalign_shifts_x = f["x"][()]
@@ -86,8 +86,11 @@ else:
 
     eui_map_seq_coalign_shifts = {"x":eui_map_seq_coalign_shifts_x*u.arcsec,"y":eui_map_seq_coalign_shifts_y*u.arcsec}
     
-eui_map_seq_coalign = coalignment.mapsequence_coalign_by_match_template(eui_map_seq,shift=eui_map_seq_coalign_shifts,clip=False)
-eui_map_seq_coalign.save("../../src/EUI/HRI/euv174/20221024/coalign_step/eui_map_seq_coalign_{index:03}.fits",overwrite=True)
+# eui_map_seq_coalign = coalignment.mapsequence_coalign_by_match_template(eui_map_seq,shift=eui_map_seq_coalign_shifts,clip=False)
+# eui_map_seq_coalign.save("../../src/EUI/HRI/euv174/20221024/coalign_step/eui_map_seq_coalign_{index:03}.fits",overwrite=True)
+    
+eui_files = sorted(glob("../../src/EUI/HRI/euv174/20221024/coalign_step/*.fits"))
+eui_map_seq_coalign = sunpy.map.Map(eui_files[:],sequence=True,memmap=True)
 
 del eui_map_seq
 
@@ -107,7 +110,7 @@ for ii, map in enumerate(tqdm(eui_map_seq_coalign[:])):
     map_date = map.date
     # map = map.reproject_to(eui_map_seq_coalign[0].wcs)
     eui_map_region_east = map.submap([400,200]*u.pix,top_right=[800,800]*u.pix)
-    eui_map_region_west = map.submap([1500,0]*u.pix,top_right=[2048,800]*u.pix)
+    eui_map_region_west = map.submap([1500,0]*u.pix,top_right=[2040,800]*u.pix)
     eui_map_region_center = map.submap([1100,700]*u.pix,top_right=[1300,1000]*u.pix)
 
     fig = plt.figure(figsize=(10,6),constrained_layout=True)
