@@ -1,0 +1,3 @@
+[submodule "ipynb/spice_psf"]
+	path = ipynb/spice_psf
+	url = https://github.com/yjzhu-solar/SPICE_psf_202210.git
