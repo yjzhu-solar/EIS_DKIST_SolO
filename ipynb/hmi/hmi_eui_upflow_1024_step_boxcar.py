@@ -52,7 +52,7 @@ def plot_colorbar(im, ax, width="3%", height="100%",loc="lower left",fontsize=10
     return clb, clb_ax
 
 
-def get_nearest_hmi_index(eui_map_date,hmi_date_obs, time_shift=datetime.timedelta(seconds=300)):
+def get_nearest_hmi_index(eui_map_date,hmi_date_obs, time_shift=datetime.timedelta(seconds=301)):
     return (np.abs(eui_map_date + time_shift - hmi_date_obs )).argmin()
 
 

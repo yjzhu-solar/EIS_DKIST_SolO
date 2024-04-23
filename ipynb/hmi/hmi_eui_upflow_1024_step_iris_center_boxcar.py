@@ -150,6 +150,7 @@ if __name__ == '__main__':
     hmi_map_repro_hrifov = sunpy.map.Map(hmi_map_repro_hrifov_files,sequence=True,memmap=True)
 
     for ii, eui_map_ in enumerate(tqdm(eui_map_seq_coalign[:])):
+        
         eui_map_date = eui_map_seq_coalign[ii].date.to_datetime()
 
         if ii < 5:
