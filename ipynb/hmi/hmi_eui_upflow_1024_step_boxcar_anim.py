@@ -144,7 +144,7 @@ if __name__ == '__main__':
 
     eui_files = sorted(glob("../../src/EUI/HRI/euv174/20221024/coalign_step_boxcar/*.fits"))
     eui_map_seq_coalign = sunpy.map.Map(eui_files[:],sequence=True,memmap=True)
-
+    
     Txshift_hri, Tyshift_hri = (1.66986 + 2.49223)*u.arcsec,(7.60204 - 2.76366 )*u.arcsec
 
     map_181 = eui_map_seq_coalign[181].shift_reference_coord(Txshift_hri,Tyshift_hri)
