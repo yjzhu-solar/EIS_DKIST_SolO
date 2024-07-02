@@ -19,14 +19,14 @@ norm = ImageNormalize(vmin=np.nanpercentile(dkist_save['im_ref'], 0.1),
                         vmax=np.nanpercentile(dkist_save['im_ref'], 99.9))
 
 im = ax.imshow(dkist_save['im_ref'], cmap='gray', norm=norm, origin='lower')
-ax.set_title(f'VBI-B H-beta {vbi_gband_dataset[0].meta['headers'][0]['DATE-AVG']}')
+ax.set_title(f'VBI-B G-band {vbi_gband_dataset[0].meta['headers'][0]['DATE-AVG']}')
 
 def update_fig(ii, fig, ax, im, dataset):
     dkist_save = readsav(reg_save_files[ii])
     im.set_data(dkist_save['im_ref'])
     im.set_norm(ImageNormalize(vmin=np.nanpercentile(dkist_save['im_ref'], 0.1),
                                  vmax=np.nanpercentile(dkist_save['im_ref'], 99.9)))
-    ax.set_title(f'VBI-B H-beta {dataset[ii].meta['headers'][0]['DATE-AVG']}')
+    ax.set_title(f'VBI-B G-band {dataset[ii].meta['headers'][0]['DATE-AVG']}')
 
 anim = animation.FuncAnimation(fig, update_fig, frames=tqdm(range(vbi_gband_dataset.dimensions[0].value.astype(int)),), 
             fargs=(fig, ax, im, vbi_gband_dataset), blit=False)
