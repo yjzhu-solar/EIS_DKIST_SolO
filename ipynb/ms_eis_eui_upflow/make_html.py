@@ -5,6 +5,8 @@ import pandas as pd
 
 
 files = glob('*.ipynb')
+additional_files = ['../aia/aia_coalign_1024_final_rsuncorr.ipynb']
+files.extend(additional_files)
 output_dir = '../../eis_eui_upflow_ipynb_html/'
 
 if os.path.exists('latest_mod_date.csv'):

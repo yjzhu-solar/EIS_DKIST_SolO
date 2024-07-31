@@ -5,6 +5,7 @@
 /sav/
 /notes/
 /.virtual_documents/
+/ipynb/dkist/
 
 # from https://github.com/github/gitignore/blob/main/Python.gitignore
 # Byte-compiled / optimized / DLL files
