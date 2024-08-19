@@ -11,8 +11,12 @@ from tqdm import tqdm
 
 
 def calc_boxcar_of(eui_map_seq, bottom_left=None, top_right=None,
-                   denoise_sigma=[5,3], of_params=[0.5, 3, 15, 3, 5, 1.2, 0]):
+                   denoise_sigma=[1,1], of_params=[0.5, 3, 15, 3, 5, 1.2, 0]):
     eui_map_seq_crop = eui_map_seq.submap(bottom_left, top_right=top_right)
+    eui_map_seq_crop_array = eui_map_seq_crop.as_array()
+    np.savez('/home/yjzhu/Solar/EIS_DKIST_SolO/sav/optical_flow/eui_map_crop_array_{:04d}_{:04d}_{:04d}_{:04d}_1024.npz'.format(*bottom_left.to_value(u.pix).astype(int),
+                                                                                                                            *top_right.to_value(u.pix).astype(int)), 
+             eui_map_seq_crop_array=eui_map_seq_crop_array)
 
     array_of = np.zeros([*eui_map_seq_crop[0].data.shape,2,len(eui_map_seq_crop)])
 
@@ -37,10 +41,15 @@ if __name__ == '__main__':
     eui_map_seq_coalign = sunpy.map.Map(eui_files[:])
     eui_map_seq_coalign = MapSequenceCoalign(eui_map_seq_coalign)
 
-    # of_east_1 = calc_boxcar_of(eui_map_seq_coalign, bottom_left=[500,600]*u.pix,top_right=[670,760]*u.pix)
+    of_east_1 = calc_boxcar_of(eui_map_seq_coalign, bottom_left=[500,600]*u.pix,top_right=[670,760]*u.pix)
 
-    # with h5py.File("/home/yjzhu/Solar/EIS_DKIST_SolO/sav/optical_flow/of_east_1.h5", "w") as f:
-    #     f.create_dataset("of_east_1", data=of_east_1)
+    with h5py.File("/home/yjzhu/Solar/EIS_DKIST_SolO/sav/optical_flow/of_east_1.h5", "w") as f:
+        f.create_dataset("of_east_1", data=of_east_1)
+
+    of_east_2 = calc_boxcar_of(eui_map_seq_coalign, bottom_left=[520,400]*u.pix, top_right=[730,600]*u.pix)
+
+    with h5py.File("/home/yjzhu/Solar/EIS_DKIST_SolO/sav/optical_flow/of_east_2.h5", "w") as f:
+        f.create_dataset("of_east_2", data=of_east_2)
 
     of_west_1 = calc_boxcar_of(eui_map_seq_coalign, bottom_left=[1700,500]*u.pix,top_right=[1970,800]*u.pix)
 

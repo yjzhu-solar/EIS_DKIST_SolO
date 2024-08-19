@@ -13,8 +13,11 @@ from tqdm import tqdm
 def calc_boxcar_of(eui_map_seq, bottom_left=None, top_right=None,
                    denoise_sigma=[5,3], of_params=[0.5, 3, 15, 3, 5, 1.2, 0]):
     eui_map_seq_crop = eui_map_seq.submap(bottom_left, top_right=top_right)
-
+    eui_map_seq_crop_array = eui_map_seq_crop.as_array()
     array_of = np.zeros([*eui_map_seq_crop[0].data.shape,2,len(eui_map_seq_crop)])
+    np.savez('/home/yjzhu/Solar/EIS_DKIST_SolO/sav/optical_flow/eui_map_crop_array_{:04d}_{:04d}_{:04d}_{:04d}_1020.npz'.format(*bottom_left.to_value(u.pix).astype(int),
+                                                                                                                        *top_right.to_value(u.pix).astype(int)), 
+            eui_map_seq_crop_array=eui_map_seq_crop_array)
 
     img_prev = denoise(eui_map_seq_crop[0].data, denoise_sigma, Triangle)
 
@@ -42,10 +45,15 @@ if __name__ == '__main__':
     # with h5py.File("/home/yjzhu/Solar/EIS_DKIST_SolO/sav/optical_flow/of_east_1.h5", "w") as f:
     #     f.create_dataset("of_east_1", data=of_east_1)
 
-    of_west_20221020_1 = calc_boxcar_of(eui_map_seq_coalign, bottom_left=[300,750]*u.pix,top_right=[500,950]*u.pix)
+    # of_west_20221020_1 = calc_boxcar_of(eui_map_seq_coalign, bottom_left=[300,750]*u.pix,top_right=[500,950]*u.pix)
 
-    with h5py.File("/home/yjzhu/Solar/EIS_DKIST_SolO/sav/optical_flow/of_west_20221020_1.h5", "w") as f:
-        f.create_dataset("of_west_20221020_1", data=of_west_20221020_1)
+    # with h5py.File("/home/yjzhu/Solar/EIS_DKIST_SolO/sav/optical_flow/of_west_20221020_1.h5", "w") as f:
+    #     f.create_dataset("of_west_20221020_1", data=of_west_20221020_1)
+
+    of_west_20221020_2 = calc_boxcar_of(eui_map_seq_coalign, bottom_left=[1800,350]*u.pix,top_right=[2048,650]*u.pix)
+
+    with h5py.File("/home/yjzhu/Solar/EIS_DKIST_SolO/sav/optical_flow/of_west_20221020_2.h5", "w") as f:
+        f.create_dataset("of_west_20221020_2", data=of_west_20221020_2)
 
 
 
