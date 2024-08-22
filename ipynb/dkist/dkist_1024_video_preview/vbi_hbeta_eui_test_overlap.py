@@ -31,6 +31,7 @@ from copy import deepcopy
 from glob import glob
 import h5py
 from tqdm import tqdm
+from watroo import wow
 
 def get_nearest_dkist_index(eui_map_date,dkist_date_obs, time_shift=300*u.s):
     return (np.abs(eui_map_date + time_shift - dkist_date_obs)).argmin()
@@ -51,27 +52,33 @@ def reproject_to_above_surface(map,target_wcs,radius=None,height=None):
 
     return map_new.reproject_to(target_wcs_new)
 
-def plot_eui_hmi_cutout(eui_map,vbi_dataset,vbi_date_obs,
-                        eui_norm,save_dir,figsize=(8,8)):
+def plot_eui_hmi_cutout(eui_map,vbi_dataset,vbi_coalign_dir,vbi_date_obs,
+                        vbi_target_wcs,eui_norm,save_dir,figsize=(6,6)):
 
     eui_map_date = eui_map[0].date
     eui_map_fake = sunpy.map.Map(eui_map[0].data,map_181.meta)
+    eui_map_fake = eui_map_fake.submap([1100,500]*u.pix, 
+                                       top_right=[1360,750]*u.pix)
+    eui_map_fake = sunpy.map.Map(wow(eui_map_fake.data, bilateral=1, denoise_coefficients=[5,3])[0],
+                                    eui_map_fake.meta)
+    
     vbi_map_index_ = get_nearest_dkist_index(eui_map_date,vbi_date_obs)
 
-    vbi_data_ = vbi_dataset[vbi_map_index_].data.compute()
+    vbi_data_ = np.load(f'{vbi_coalign_dir}/vbi_hbeta_coalign_of_{vbi_map_index_:03d}.npz')['img']
+    vbi_data_ = vbi_data_[32:-32,32:-32]
     vbi_date_ = vbi_date_obs[vbi_map_index_] 
     vbi_norm_ = ImageNormalize(vmin=np.nanpercentile(vbi_data_, 0.1),
                                 vmax=np.nanpercentile(vbi_data_, 99.9))
 
     eui_map_cutout = reproject_to_above_surface(eui_map_fake,target_wcs=vbi_target_wcs,
                                                 height=2.8*u.Mm)
-
+    
     fig = plt.figure(figsize=figsize,layout='constrained')
 
     ax1 = fig.add_subplot(111,projection=eui_map_cutout.wcs)
 
-    im2 = ax1.imshow(vbi_data_,cmap="gray",origin="lower",norm=vbi_norm_,alpha=0.8)
-    im1 = eui_map_cutout.plot(axes=ax1,norm=eui_norm,cmap="solar orbiterhri_euv174",alpha=0.5)
+    im2 = ax1.imshow(vbi_data_,cmap="gray",origin="lower",norm=vbi_norm_,alpha=1)
+    im1 = eui_map_cutout.plot(axes=ax1,norm=eui_norm,cmap="solar orbiterhri_euv174",alpha=0.4)
     
     
     ax1.set_title(f"Reprojected EUI/HRI 17.4 nm + VBI-B H-Beta {eui_map_date.strftime('%Y-%m-%d %H:%M:%S')}")
@@ -82,9 +89,15 @@ def plot_eui_hmi_cutout(eui_map,vbi_dataset,vbi_date_obs,
 
         eui_map_date = eui_map[ii].date
         eui_map_fake = sunpy.map.Map(eui_map[ii].data,map_181.meta)
+        eui_map_fake = eui_map_fake.submap([1100,500]*u.pix, 
+                                        top_right=[1360,750]*u.pix)
+        eui_map_fake = sunpy.map.Map(wow(eui_map_fake.data, bilateral=1, denoise_coefficients=[5,3])[0],
+                                        eui_map_fake.meta)
+        
         vbi_map_index_ = get_nearest_dkist_index(eui_map_date,vbi_date_obs)
 
-        vbi_data_ = vbi_dataset[vbi_map_index_].data.compute()
+        vbi_data_ = np.load(f'{vbi_coalign_dir}/vbi_hbeta_coalign_of_{vbi_map_index_:03d}.npz')['img']
+        vbi_data_ = vbi_data_[32:-32,32:-32]
         vbi_date_ = vbi_date_obs[vbi_map_index_] 
         vbi_norm_ = ImageNormalize(vmin=np.nanpercentile(vbi_data_, 0.1),
                                     vmax=np.nanpercentile(vbi_data_, 99.9))
@@ -98,13 +111,13 @@ def plot_eui_hmi_cutout(eui_map,vbi_dataset,vbi_date_obs,
 
         axes[0].set_title(f"Reprojected EUI/HRI 17.4 nm + VBI-B H-Beta {eui_map_date.strftime('%Y-%m-%d %H:%M:%S')}")
 
-    anim = animation.FuncAnimation(fig, update_fig, frames=tqdm(range(len(eui_map))),
+    anim = animation.FuncAnimation(fig, update_fig, frames=tqdm(range(len(eui_map))), #frames=tqdm(range(20)), #
                 fargs=(fig, [im1,im2], [ax1], eui_map, vbi_dataset, vbi_date_obs), blit=False)
     
     if not os.path.exists(os.path.dirname(save_dir)):
         os.makedirs(os.path.dirname(save_dir))
     
-    anim.save(save_dir, fps=30,dpi=400)
+    anim.save(save_dir, fps=30,dpi=300)
     
 
 
@@ -119,17 +132,18 @@ if __name__ == '__main__':
 
     map_181_wcs = map_181.wcs
 
-    vbi_hmi_xshift, vbi_hmi_yshift = 12.18182287*u.arcsec, 4.16110362*u.arcsec
+    vbi_hmi_xshift, vbi_hmi_yshift = 4.40*u.arcsec, 1.46*u.arcsec
 
-    dkist_vbi_target_map = sunpy.map.Map('../../../src/DKIST/vbi_1024/BJOLO/VBI_2022_10_24T19_20_05_866_00486136_I_BJOLO_L1.fits')
+    dkist_vbi_target_map = sunpy.map.Map('../../../src/DKIST/vbi_1024/BJOLO/VBI_2022_10_24T18_59_13_686_00486136_I_BJOLO_L1.fits')
     dkist_vbi_target_map = dkist_vbi_target_map.shift_reference_coord(vbi_hmi_xshift,vbi_hmi_yshift)
-    vbi_target_wcs = dkist_vbi_target_map.wcs
+    vbi_target_wcs = dkist_vbi_target_map.wcs[257:-256:4,257:-256:4]
 
     vbi_dataset = dkist.load_dataset('../../../src/DKIST/vbi_1024/BJOLO/')
+    vbi_coalign_dir = '../../../sav/DKIST_of/BJOLO/33'
 
-    plot_eui_hmi_cutout(eui_map_seq_coalign,vbi_dataset,Time(vbi_dataset.headers['DATE-AVG']),
-                        ImageNormalize(vmin=5e2,vmax=1.2e4,stretch=AsinhStretch(0.4)),
-                        save_dir='../../../figs/DKIST/VBI_preview/vbi_1024_hbeta_eui_overlap.mp4',figsize=(10,10))
+    plot_eui_hmi_cutout(eui_map_seq_coalign,vbi_dataset,vbi_coalign_dir,Time(vbi_dataset.headers['DATE-AVG']),
+                        vbi_target_wcs,ImageNormalize(),
+                        save_dir='../../../figs/DKIST/VBI_preview/vbi_1024_hbeta_eui_overlap.mp4')
 
 
 
