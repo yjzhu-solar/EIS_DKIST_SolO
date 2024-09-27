@@ -1,7 +1,8 @@
 pro sotsp_new_raster
 
 ; sotsp_file = "../src/SOTSP/20221026/lvl2/20221026_184140.fits"
-sotsp_file = "../src/SOTSP/20221025/lvl2/20221025_184140/20221025_184140.fits"
+; sotsp_file = "../src/SOTSP/20221025/lvl2/20221025_184140/20221025_184140.fits"
+sotsp_file = "../src/SOTSP/20221023/lvl2/20221023_184139/20221023_184139.fits"
 
 read_sotsp,sotsp_file,index,data,scan_info=scan_info,/xycoord
 slitmap=sotsp_rasterize(scan_info)
@@ -13,6 +14,6 @@ data_new=make_array(dim=new_dims,type=size(data,/type))
 for ii=0,slitmap_dims[0]-1 do if slitmap[ii] ge 0 then data_new[ii,*,*]=data[slitmap[ii],*,*]
 
 
-save,filename="../src/SOTSP/20221025/lvl2/20221025_184140/sotsp_lvl2_missing_col_corrected.sav", data_new, slitmap
+save,filename="../src/SOTSP/20221023/lvl2/20221023_184139/sotsp_lvl2_missing_col_corrected.sav", data_new, slitmap
 
 end
