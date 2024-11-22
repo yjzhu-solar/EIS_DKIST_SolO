@@ -31,6 +31,8 @@ if __name__ == "__main__":
     si_10_258_1c_template = "../../../src/EIS/EISPAC_templates/si_10_258_375.1c.template.h5"
     si_10_261_1c_template = "../../../src/EIS/EISPAC_templates/si_10_261_058.1c.template.h5"
 
+    s_10_264_1c_template = "../../../src/EIS/EISPAC_templates/s__10_264_233.1c.template.h5"
+
     templates = [fe_08_185_1c_template, fe_09_188_1c_template,
                 fe_09_197_1c_template, fe_10_184_1c_template,
                 fe_11_188_2c_template, fe_12_186_1c_template, 
@@ -42,7 +44,7 @@ if __name__ == "__main__":
                 o__06_184_1c_template, mg_06_270_2c_template, 
                 si_07_275_1c_template, mg_07_276_1c_template, 
                 mg_07_280_1c_template, si_10_258_1c_template, 
-                si_10_261_1c_template]
+                si_10_261_1c_template, s_10_264_1c_template]
     
     for template in templates:
         eispac_fit(data_filepath, template)
