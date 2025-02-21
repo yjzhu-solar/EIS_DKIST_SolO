@@ -7,7 +7,7 @@ import sunpy.map
 from sunpy.coordinates import propagate_with_solar_surface
 import astropy.units as u
 import astropy.constants as const
-from astropy.visualization import ImageNormalize
+from astropy.visualization import ImageNormalize, AsinhStretch
 from astropy.coordinates import SkyCoord
 from astropy.time import Time
 from watroo import wow
@@ -33,10 +33,12 @@ def plot_iris_map(eui_files, iris_1400_map_dir, iris_2796_map_dir,
 
     eui_map_boundary = get_map_edge_coords(eui_map_fake, step=10)
     
-    iris_1400_map_ = read_iris_sji(iris_1400_map_dir, index=eui_earth_time, sdo_rsun=True)
+    iris_1400_map_ = read_iris_sji(iris_1400_map_dir, index=eui_earth_time, sdo_rsun=True, nbin=3)
     iris_1400_map_ = sunpy.map.Map(wow(iris_1400_map_.data, bilateral=1, denoise_coefficients=[3,3])[0], iris_1400_map_.meta).rotate()
-    iris_2796_map_ = read_iris_sji(iris_2796_map_dir, index=eui_earth_time, sdo_rsun=True)
+    # iris_1400_map_ = iris_1400_map_.rotate()
+    iris_2796_map_ = read_iris_sji(iris_2796_map_dir, index=eui_earth_time, sdo_rsun=True, nbin=3)
     iris_2796_map_ = sunpy.map.Map(wow(iris_2796_map_.data, bilateral=1, denoise_coefficients=[3,3])[0], iris_2796_map_.meta).rotate()
+    # iris_2796_map_ = iris_2796_map_.rotate()
 
     with propagate_with_solar_surface():
         iris_1400_map_r = iris_1400_map_.reproject_to(iris_1400_example_map_region.wcs)
@@ -53,8 +55,18 @@ def plot_iris_map(eui_files, iris_1400_map_dir, iris_2796_map_dir,
     
 
     im1 = ax1.imshow(eui_map_fake.data, cmap='sdoaia171', norm=ImageNormalize())
-    im2 = ax2.imshow(iris_1400_map_r.data, cmap='irissji1400', norm=ImageNormalize())
-    im3 = ax3.imshow(iris_2796_map_r.data, cmap='irissji2796', norm=ImageNormalize())
+    im2 = ax2.imshow(iris_1400_map_r.data, cmap='irissji1400',
+                     norm=ImageNormalize(vmin=np.nanpercentile(iris_1400_map_r.data, 0.1),
+                                          vmax=np.nanpercentile(iris_1400_map_r.data, 99.9)))
+                    #  norm=ImageNormalize(vmin=np.nanpercentile(iris_1400_map_r.data, 0.1),
+                    #                      vmax=np.nanpercentile(iris_1400_map_r.data, 99.9),
+                    #                      stretch=AsinhStretch(0.2)))
+    im3 = ax3.imshow(iris_2796_map_r.data, cmap='irissji2796',
+                        norm=ImageNormalize(vmin=np.nanpercentile(iris_2796_map_r.data, 0.1),
+                                             vmax=np.nanpercentile(iris_2796_map_r.data, 99.9)))
+                    #  norm=ImageNormalize(vmin=np.nanpercentile(iris_2796_map_r.data, 0.1),
+                    #                      vmax=np.nanpercentile(iris_2796_map_r.data, 99.9),
+                    #                      stretch=AsinhStretch(0.2)))
 
     for ax_ in (ax2,ax3):
         bounds = ax_.axis()
@@ -109,10 +121,12 @@ def plot_iris_map(eui_files, iris_1400_map_dir, iris_2796_map_dir,
         
         eui_map_fake = eui_map_fake.submap(eui_bottom_left,top_right=eui_top_right)
 
-        iris_1400_map_ = read_iris_sji(iris_1400_map_dir, index=eui_earth_time, sdo_rsun=True)
+        iris_1400_map_ = read_iris_sji(iris_1400_map_dir, index=eui_earth_time, sdo_rsun=True, nbin=3)
         iris_1400_map_ = sunpy.map.Map(wow(iris_1400_map_.data, bilateral=1, denoise_coefficients=[3,3])[0], iris_1400_map_.meta).rotate()
-        iris_2796_map_ = read_iris_sji(iris_2796_map_dir, index=eui_earth_time, sdo_rsun=True)
+        # iris_1400_map_ = iris_1400_map_.rotate()
+        iris_2796_map_ = read_iris_sji(iris_2796_map_dir, index=eui_earth_time, sdo_rsun=True, nbin=3)
         iris_2796_map_ = sunpy.map.Map(wow(iris_2796_map_.data, bilateral=1, denoise_coefficients=[3,3])[0], iris_2796_map_.meta).rotate()
+        # iris_2796_map_ = iris_2796_map_.rotate()
 
         with propagate_with_solar_surface():
             iris_1400_map_r = iris_1400_map_.reproject_to(iris_1400_example_map_region.wcs)
@@ -128,7 +142,7 @@ def plot_iris_map(eui_files, iris_1400_map_dir, iris_2796_map_dir,
 
         return ims, texts
     
-    anim = FuncAnimation(fig, update_fig, frames = tqdm(range(len(eui_files))), #tqdm(range(10)), 
+    anim = FuncAnimation(fig, update_fig, frames = tqdm(range(len(eui_files))), #tqdm(range(20)), #
                             fargs=([im1,im2,im3], [text1,text2,text3], eui_files, iris_1400_map_dir, iris_2796_map_dir,
                                     iris_1400_example_map_region, iris_2796_example_map_region),
                             blit=False)
@@ -237,7 +251,7 @@ if __name__ == '__main__':
                                                     top_right=SkyCoord(-825*u.arcsec, 300*u.arcsec, frame=iris_sji_2796_map_example.coordinate_frame))
     
         
-    iris_sji_1400_map_dir = '../../../src/IRIS/20221020/1905/iris_l2_20221020_190518_3640007428_SJI_2796_t000_deconvolved.fits'
+    iris_sji_1400_map_dir = '../../../src/IRIS/20221020/1905/iris_l2_20221020_190518_3640007428_SJI_1400_t000.fits'
     iris_sji_2796_map_dir = '../../../src/IRIS/20221020/1905/iris_l2_20221020_190518_3640007428_SJI_2796_t000_deconvolved.fits'
 
 
