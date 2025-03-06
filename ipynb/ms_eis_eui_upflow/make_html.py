@@ -5,7 +5,7 @@ import pandas as pd
 
 
 files = glob('*.ipynb')
-additional_files = ['../aia/aia_coalign_1024_final_rsuncorr.ipynb']
+additional_files = ['../aia/aia_coalign_1024_final_rsuncorr.ipynb', '../spice_psf/ipynb/spice_1024_NeVIII_ms_version.ipynb']
 files.extend(additional_files)
 output_dir = '../../eis_eui_upflow_ipynb_html/'
 
