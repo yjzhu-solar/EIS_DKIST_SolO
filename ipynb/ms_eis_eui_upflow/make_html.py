@@ -2,6 +2,9 @@ from ipy2html import ipy2html
 from glob import glob
 import os
 import pandas as pd
+import sys
+from markdown_it import MarkdownIt
+from pathlib import Path
 
 
 files = glob('*.ipynb')
@@ -53,5 +56,82 @@ else:
     latest_mod_date.to_csv('latest_mod_date.csv', index=False)
 
     print('New files:', [os.path.basename(file) for file in file_name])
+
+# generate index.html from README.md
+# code copied from Claude
+
+def convert_markdown_to_html(markdown_content):
+    """Convert markdown content to HTML using markdown-it-py."""
+    md = MarkdownIt()
+    return md.render(markdown_content)
+
+def read_markdown_file(file_path):
+    """Read content from a markdown file."""
+    with open(file_path, 'r', encoding='utf-8') as f:
+        return f.read()
+
+def write_html_file(file_path, html_content):
+    """Write HTML content to a file."""
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+
+def make_index(input_file, output_file):
+    try:
+        # Read markdown content
+        markdown_content = read_markdown_file(input_file)
+        
+        # Convert to HTML
+        html_content = convert_markdown_to_html(markdown_content)
+        
+        # Generate a simple HTML document
+        full_html = f"""<!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="utf-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1">
+                        <title>{Path(input_file).stem}</title>
+                        <style>
+                            body {{
+                                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                                line-height: 1.6;
+                                max-width: 800px;
+                                margin: 0 auto;
+                                padding: 20px;
+                            }}
+                            pre {{
+                                background-color: #f5f5f5;
+                                padding: 12px;
+                                border-radius: 4px;
+                                overflow-x: auto;
+                            }}
+                            code {{
+                                font-family: Monaco, Consolas, "Courier New", monospace;
+                            }}
+                        </style>
+                    </head>
+                    <body>
+                        {html_content}
+                    </body>
+                    </html>"""
+        
+        # Write to output file
+        write_html_file(output_file, full_html)
+        
+        print(f"Converted {input_file} to {output_file}")
+    
+    except FileNotFoundError:
+        print(f"Error: File '{input_file}' not found.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        sys.exit(1)
+
+if os.path.exists('../../index.html'):
+    # delete the existing index.html
+    os.remove('../../index.html')
+
+make_index('../../README.md', '../../index.html')
+
+
     
 
