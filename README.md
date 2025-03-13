@@ -1,6 +1,7 @@
 [![Static Badge](https://img.shields.io/badge/GitHub-yjzhu--solar%2FEIS__DKIST__SolO-%23EB7A77?style=flat-square)
 ](https://github.com/yjzhu-solar/EIS_DKIST_SolO)
 [![Static Badge](https://img.shields.io/badge/GitHub--Pages-EIS__DKIST__SolO-%237BA23F)](https://yjzhu-solar.github.io/EIS_DKIST_SolO/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15017487.svg)](https://doi.org/10.5281/zenodo.15017487)
 
 # Active region upflows in various EUV morphologies observed by Solar Orbiter and near-Earth observatories
 This messy repository is a collection of Python and IDL scripts analyzing the coordinated observations of upflow regions in the periphery of a decaying active region. The data were obtained by instruments onboard ESA's Solar Orbiter and other near-Earth observatories, for example, the Hinode spacecraft, the Solar Dynamics Observatory (SDO), and the Interface Region Imaging Spectrograph (IRIS). The scripts in this repository were used to calibrate, register, and analyze the data. The authors aim to improve the knowledge of the physical processes that drive the active region upflows, including their temperature dependence, the role of magnetic fields, potential contribution from the fine structures in transition region and lower corona, and the connections to the lower atmosphere.
