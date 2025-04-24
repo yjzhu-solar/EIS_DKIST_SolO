@@ -31,14 +31,12 @@ The results are summarized in a manuscript about to be submitted to the Astronom
 
 [Figure 11](https://yjzhu-solar.github.io/EIS_DKIST_SolO/eis_eui_upflow_ipynb_html/hri_spice_evolution.html): Evolution of the east upflow region observed by EUI/HRIEUV, SPICE and PHI/HRT. 
 
-[Figure A.1](https://yjzhu-solar.github.io/EIS_DKIST_SolO/eis_eui_upflow_ipynb_html/coalign_flowmap.html): Coalignment of the observations from Solar Orbiter and near-Earth observatories.
+[Figure B.1](https://yjzhu-solar.github.io/EIS_DKIST_SolO/eis_eui_upflow_ipynb_html/coalign_flowmap.html): Coalignment of the observations from Solar Orbiter and near-Earth observatories.
 
-[Figure B.1](https://yjzhu-solar.github.io/EIS_DKIST_SolO/eis_eui_upflow_ipynb_html/spice_spurious_vel.html): Proxies of spurious velocities in the SPICE data.
+[Figure C.1](https://yjzhu-solar.github.io/EIS_DKIST_SolO/eis_eui_upflow_ipynb_html/spice_spurious_vel.html): Proxies of spurious velocities in the SPICE data.
 
-[Figure B.2](https://yjzhu-solar.github.io/EIS_DKIST_SolO/eis_eui_upflow_ipynb_html/spice_1024_NeVIII_ms_version.html): Experimental SPICE PSF deconvolution results.
+[Figure C.2](https://yjzhu-solar.github.io/EIS_DKIST_SolO/eis_eui_upflow_ipynb_html/spice_1024_NeVIII_ms_version.html): Experimental SPICE PSF deconvolution results.
 
-[Figure C.1](https://yjzhu-solar.github.io/EIS_DKIST_SolO/eis_eui_upflow_ipynb_html/app_eis_stray_light.html): Estimating the stray light contamination in the EIS data.
-
-
+[Figure D.1](https://yjzhu-solar.github.io/EIS_DKIST_SolO/eis_eui_upflow_ipynb_html/app_eis_stray_light.html): Estimating the stray light contamination in the EIS data.
 
 
