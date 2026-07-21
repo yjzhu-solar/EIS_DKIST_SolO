@@ -1,3 +1,4 @@
+[![A&A](https://img.shields.io/badge/A%26A-701%2C%20A205%20(2025)-1E88E5?style=flat-square)](https://doi.org/10.1051/0004-6361/202555618)
 [![Static Badge](https://img.shields.io/badge/GitHub-yjzhu--solar%2FEIS__DKIST__SolO-%23EB7A77?style=flat-square)
 ](https://github.com/yjzhu-solar/EIS_DKIST_SolO)
 [![Static Badge](https://img.shields.io/badge/GitHub--Pages-EIS__DKIST__SolO-%237BA23F)](https://yjzhu-solar.github.io/EIS_DKIST_SolO/)
